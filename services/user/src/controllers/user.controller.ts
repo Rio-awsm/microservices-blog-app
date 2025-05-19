@@ -1,6 +1,8 @@
+import { v2 as cloudinary } from "cloudinary";
 import jwt from "jsonwebtoken";
 import { AuthenticatedRequest } from "../middleware/isAuth.js";
 import User from "../model/user.model.js";
+import getBuffer from "../utils/dataUri.js";
 import TryCatch from "../utils/tryCatch.js";
 
 export const loginUser = TryCatch(async (req, res) => {
@@ -68,3 +70,45 @@ export const updateUser = TryCatch(async (req: AuthenticatedRequest, res) => {
     user,
   });
 });
+
+export const upDateProfilePic = TryCatch(
+  async (req: AuthenticatedRequest, res) => {
+    const file = req.file;
+
+    if (!file) {
+      res.status(400).json({
+        message: "No file to upload",
+      });
+      return;
+    }
+
+    const fileBuffer = getBuffer(file);
+
+    if (!fileBuffer || !fileBuffer.content) {
+      res.status(400).json({
+        message: "Failed to generate buffer",
+      });
+      return;
+    }
+
+    const cloud = await cloudinary.uploader.upload(fileBuffer.content, {
+      folder: "blogs",
+    });
+
+    const user = await User.findByIdAndUpdate(
+      req.user?._id,
+      {
+        image: cloud.secure_url,
+      },
+      { new: true }
+    );
+    const token = jwt.sign({ user }, process.env.JWT_SEC as string, {
+      expiresIn: "5d",
+    });
+    res.json({
+      message: "User Profile pic updated",
+      token,
+      user,
+    });
+  }
+);
