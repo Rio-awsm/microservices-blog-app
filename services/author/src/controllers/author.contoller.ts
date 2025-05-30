@@ -33,7 +33,7 @@ export const createBlog = TryCatch(async (req: AuthenticatedRequest, res) => {
   const result =
     await sql`INSERT INTO blogs (title, description, image, blogcontent,category, author) VALUES (${title}, ${description},${cloud.secure_url},${blogcontent},${category},${req.user?._id}) RETURNING *`;
 
-    await invalidateCacheJob(["blogs:*"])
+  await invalidateCacheJob(["blogs:*"]);
 
   res.json({
     message: "Blog Created",
@@ -91,6 +91,8 @@ export const updateBlog = TryCatch(async (req: AuthenticatedRequest, res) => {
   RETURNING *
   `;
 
+  await invalidateCacheJob(["blogs:*", `blog:${id}`]);
+
   res.json({
     message: "Blog Updated",
     blog: updatedBlog[0],
@@ -117,6 +119,9 @@ export const deleteBlog = TryCatch(async (req: AuthenticatedRequest, res) => {
   await sql`DELETE FROM savedblogs WHERE blogid = ${req.params.id}`;
   await sql`DELETE FROM comments WHERE blogid = ${req.params.id}`;
   await sql`DELETE FROM blogs WHERE id = ${req.params.id}`;
+
+
+  await invalidateCacheJob(["blogs:*", `blog:${req.params.id}`]);
 
   res.json({
     message: "Blog Deleted",

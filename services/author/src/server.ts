@@ -1,4 +1,5 @@
 import { v2 as cloudinary } from "cloudinary";
+import cors from "cors";
 import dotenv from "dotenv";
 import express from "express";
 import authorRoutes from "./routes/author.routes.js";
@@ -15,6 +16,7 @@ cloudinary.config({
 
 const app = express();
 app.use(express.json());
+app.use(cors())
 
 connectRabbitMQ()
 
