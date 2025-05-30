@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import express from "express";
 import authorRoutes from "./routes/author.routes.js";
 import { initDB } from "./utils/initDB.js";
+import { connectRabbitMQ } from "./utils/rabbitmq.js";
 
 dotenv.config();
 
@@ -14,6 +15,8 @@ cloudinary.config({
 
 const app = express();
 app.use(express.json());
+
+connectRabbitMQ()
 
 const port = process.env.PORT;
 
