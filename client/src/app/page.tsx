@@ -1,10 +1,5 @@
-import { Button } from "@/components/ui/button";
+import { redirect } from "next/navigation";
 
 export default function Home() {
-  return (
-    <div>
-      Home
-      <Button>Click me</Button>
-    </div>
-  );
+  return redirect("/blogs");
 }
