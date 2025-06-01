@@ -1,5 +1,5 @@
 "use client";
-import { AppContextType, Blog, User } from "@/types";
+import { AppContextType, Blog, SavedBlogType, User } from "@/types";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import axios from "axios";
 import Cookies from "js-cookie";
@@ -38,6 +38,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isAuth, setIsAuth] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [savedBlogs, setSavedBlogs] = useState<SavedBlogType[] | null>(null);
   const [blogLoading, setBlogLoading] = useState(true);
 
   const [blogs, setBlogs] = useState<Blog[] | null>(null);
@@ -71,9 +72,28 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     toast.success("user Logged Out");
   }
 
+  async function fetchBlogs() {
+    setBlogLoading(true)
+    try {
+      const { data } = await axios.get(
+        `${blog_service}/api/v1/blog/all?searchQuery=${searchQuery}&category=${category}`
+      );
+
+      setBlogs(data);
+    } catch (error) {
+       console.log(error);
+    } finally {
+      setBlogLoading(false);
+    }
+  }
+
   useEffect(() => {
     fetchUser();
   }, []);
+
+  useEffect(() => {
+    fetchBlogs();
+  }, [searchQuery, category]);
 
   return (
     <AppContext.Provider
@@ -90,6 +110,8 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
         setCategory,
         setSearchQuery,
         searchQuery,
+        fetchBlogs,
+        savedBlogs,
       }}
     >
       <GoogleOAuthProvider clientId={googleClientID || " "}>
