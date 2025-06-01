@@ -154,16 +154,17 @@ export const aiTitleResponse = TryCatch(async (req, res) => {
       });
       return;
     }
+
     result = rawtext
       .replace(/\*\*/g, "")
       .replace(/[\r\n]+/g, "")
       .replace(/[*_`~]/g, "")
       .trim();
-
-    await main();
-
-    res.json(result);
   }
+
+  await main();
+
+  res.json(result);
 });
 
 export const aiDescriptionResponse = TryCatch(async (req, res) => {
@@ -227,7 +228,7 @@ image tags, line breaks, and structural tags exactly as they are. Return the ful
 
   const ai = new GoogleGenerativeAI(process.env.GEMINI_API_KEY as string);
 
-  const model = ai.getGenerativeModel({ model: "gemini-1.5-pro" });
+  const model = ai.getGenerativeModel({ model: "gemini-2.0-flash" });
 
   const result = await model.generateContent({
     contents: [
@@ -253,4 +254,4 @@ image tags, line breaks, and structural tags exactly as they are. Return the ful
     .trim();
 
   res.status(200).json({ html: cleanedHtml });
-})
+});
