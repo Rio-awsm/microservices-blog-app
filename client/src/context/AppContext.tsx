@@ -87,8 +87,12 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     }
   }
 
+  async function getSavedBlogs() {
+
+  }
   useEffect(() => {
     fetchUser();
+    getSavedBlogs();
   }, []);
 
   useEffect(() => {
@@ -102,6 +106,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
         setIsAuth,
         isAuth,
         setLoading,
+        getSavedBlogs,
         loading,
         setUser,
         logoutUser,
